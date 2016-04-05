@@ -1,1 +1,25 @@
+--Python基础
 print("hello world")
+classmates=['Michael','Bob','Tracy']
+len(classmates)
+classmates[0]
+classmates[-1]  //获取倒数第一个元素
+classmates[-2]  //获取倒数第二个元素
+classmates.append('Adam')
+classmates.insert(1,'Jack')
+classmates.pop()  //删除末尾元素
+classmates.pop(1) //删除指定位置的元素
+L=['Apple',123,True]  //list里面的元素的数据类型可以不同
+s=['python','java',['asp','php'],'scheme']  //list里面可以是另一个list
+
+t=(1,2)  //定义一个tuple，其元素必须确定下来
+t=(1)   t=(1,)   //区别:第一个是数学公式，第二个才是1个元素的tuple
+t=('a','b',['A','B'])
+
+age=3
+if age>=18:
+   print('your age is',age)
+   print('adult')
+else:
+   print('your age is',age)
+   print('teenager')
