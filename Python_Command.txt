@@ -33,4 +33,97 @@ for i in range(1, 10) :
         print(j, 'x', i, '=', j*i, '\t',)
     print('\n')
 	
+d={'Michael':95,'Bob':75,'Tracy':85}
+d['Jack']=98
+'Thomas' in d //判断Thomas是否在d中
+d.get('Thomas') //如果不存在，返还None
+d.get('Thomas',-1) //如果不存在，返还指定的-1
+d.pop('Bob')
+s=set([1,2,3])
+
+--函数
+def my_abs(x):
+   if not isinstance(x,(int,float)):    //参数检查
+      raise TypeError('bad operand type')
+   if x>=0:
+     return x
+   else:
+     return -x
+	 
+from abstest import my_abs  //从文件abstest中导入my_abs函数，注意abstest没有.py后缀
+
+def pop():
+    pass
+	
+import math
+def move(x,y,step,angle=0):
+    nx=x+step*math.cos(angle)
+	ny=y-step*math.sin(angle)
+	return nx,ny
+    
+//位置参数
+def enroll(name,gender,age=6,city='Beijing'):
+    print('name:',name)
+    print('gender:',gender)
+    print('age:',age)
+    print('city:',city)
+    
+//可变参数，函数内部参数numbers接收到的是一个tuple
+def calc(*numbers):
+    sum=0
+    for n in numbers:
+        sum=sum+n*n
+    return sum
+    
+//关键字参数，函数内部参数kw接收到的是一个dict
+def person(name,age,**kw):
+    print('name:',name,'age:',age,'Other:',kw)
+    
+>>>extra={'city':'Beijing','Job':'Engineer'}
+>>>person('Jack',24,city=extra['city'],Job=extra['Job'])
+>>>person('Jack',24,**extra)
+name:Jack age:24 other:{'city':'Beijing','Job':'Engineer'}
+def person(name,age,**kw):
+    if 'city' in kw:
+        #有city参数
+    if 'Job' in kw:
+        #有Job参数
+    print('name:',name,'age:',age,'Other:',kw)
+
+//命名关键字参数,*后面的参数被视为命名关键字参数
+#命名关键字参数必须传入参数名，这和位置参数不同。如果没有传入参数名，调用将报错
+def person(name,age,*,city,job):
+    print(name,age,city,job)
+#命名关键字参数可以有缺失值，调用时，可不传入city参数
+def person(name,age,*,city='Beijing',job)
+    print(name,age,city,job)
+    
+#五种参数：必选参数，默认参数，可变参数，关键字参数，命名关键字参数
+#除了可变参数无法和命名关键字参数混合使用，其他可以组合使用
+#参数定义的顺序必选是：必选参数，默认参数，可变参数/命名关键字参数和关键字参数，如下：
+def fl(a,b,c=0,*args,**kw):
+    print('a=',a,'b=',b,'c=',c,'args=',args,'kw=',kw)
+def f2(a,b,c=0,*,d,**kw):
+    print('a=',a,'b=',b,'c=',c,'args=',args,'kw=',kw)
+
+#小结
+#*args是可变参数，args接收的是一个tuple;
+#**kw是关键字参数，kw接收的是一个dict
+
+#递归函数
+def fact(n):
+        if n==1:
+            return 1
+        else:
+            return n*fact(n-1)
+            
+ #尾递归
+
+def fact(n):
+    return fact_iter(n,1)
+
+def fact_iter(num,product):
+    if num==1:
+        return product
+    return fact_iter(num-1,num*product)
 	
