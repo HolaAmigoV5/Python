@@ -1,19 +1,22 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 --Python基础
 print("hello world")
 classmates=['Michael','Bob','Tracy']
 len(classmates)
 classmates[0]
-classmates[-1]  //获取倒数第一个元素
-classmates[-2]  //获取倒数第二个元素
+classmates[-1]  #获取倒数第一个元素
+classmates[-2]  #获取倒数第二个元素
 classmates.append('Adam')
 classmates.insert(1,'Jack')
-classmates.pop()  //删除末尾元素
-classmates.pop(1) //删除指定位置的元素
-L=['Apple',123,True]  //list里面的元素的数据类型可以不同
-s=['python','java',['asp','php'],'scheme']  //list里面可以是另一个list
+classmates.pop()  #删除末尾元素
+classmates.pop(1) #删除指定位置的元素
+L=['Apple',123,True]  #list里面的元素的数据类型可以不同
+s=['python','java',['asp','php'],'scheme']  #list里面可以是另一个list
 
-t=(1,2)  //定义一个tuple，其元素必须确定下来
-t=(1)   t=(1,)   //区别:第一个是数学公式，第二个才是1个元素的tuple
+t=(1,2)  #定义一个tuple，其元素必须确定下来
+t=(1)   t=(1,)   #区别:第一个是数学公式，第二个才是1个元素的tuple
 t=('a','b',['A','B'])
 
 age=3
@@ -35,22 +38,22 @@ for i in range(1, 10) :
 	
 d={'Michael':95,'Bob':75,'Tracy':85}
 d['Jack']=98
-'Thomas' in d //判断Thomas是否在d中
-d.get('Thomas') //如果不存在，返还None
-d.get('Thomas',-1) //如果不存在，返还指定的-1
+'Thomas' in d #判断Thomas是否在d中
+d.get('Thomas') #如果不存在，返还None
+d.get('Thomas',-1) #如果不存在，返还指定的-1
 d.pop('Bob')
 s=set([1,2,3])
 
 --函数
 def my_abs(x):
-   if not isinstance(x,(int,float)):    //参数检查
+   if not isinstance(x,(int,float)):    #参数检查
       raise TypeError('bad operand type')
    if x>=0:
      return x
    else:
      return -x
 	 
-from abstest import my_abs  //从文件abstest中导入my_abs函数，注意abstest没有.py后缀
+from abstest import my_abs  #从文件abstest中导入my_abs函数，注意abstest没有.py后缀
 
 def pop():
     pass
@@ -61,21 +64,21 @@ def move(x,y,step,angle=0):
 	ny=y-step*math.sin(angle)
 	return nx,ny
     
-//位置参数
+#位置参数
 def enroll(name,gender,age=6,city='Beijing'):
     print('name:',name)
     print('gender:',gender)
     print('age:',age)
     print('city:',city)
     
-//可变参数，函数内部参数numbers接收到的是一个tuple
+#可变参数，函数内部参数numbers接收到的是一个tuple
 def calc(*numbers):
     sum=0
     for n in numbers:
         sum=sum+n*n
     return sum
     
-//关键字参数，函数内部参数kw接收到的是一个dict
+#关键字参数，函数内部参数kw接收到的是一个dict
 def person(name,age,**kw):
     print('name:',name,'age:',age,'Other:',kw)
     
@@ -90,7 +93,7 @@ def person(name,age,**kw):
         #有Job参数
     print('name:',name,'age:',age,'Other:',kw)
 
-//命名关键字参数,*后面的参数被视为命名关键字参数
+#命名关键字参数,*后面的参数被视为命名关键字参数
 #命名关键字参数必须传入参数名，这和位置参数不同。如果没有传入参数名，调用将报错
 def person(name,age,*,city,job):
     print(name,age,city,job)
@@ -100,7 +103,7 @@ def person(name,age,*,city='Beijing',job)
     
 #五种参数：必选参数，默认参数，可变参数，关键字参数，命名关键字参数
 #除了可变参数无法和命名关键字参数混合使用，其他可以组合使用
-#参数定义的顺序必选是：必选参数，默认参数，可变参数/命名关键字参数和关键字参数，如下：
+#参数定义的顺序必须是：必选参数，默认参数，可变参数/命名关键字参数和关键字参数，如下：
 def fl(a,b,c=0,*args,**kw):
     print('a=',a,'b=',b,'c=',c,'args=',args,'kw=',kw)
 def f2(a,b,c=0,*,d,**kw):
@@ -127,3 +130,45 @@ def fact_iter(num,product):
         return product
     return fact_iter(num-1,num*product)
 	
+--高级特性
+>>>L=['Michael','Sarah','Tracy','Bob','Jack']
+>>>L[0:3]   #切片：从索引0开始取，直到索引3为止，但不包括索引3
+>>>L[:3]    #同上，简写方式
+>>>L[-2:]             ['Bob','Jack']
+>>>L[-2:-1]           ['Bob']
+
+>>>L=list(range(100))
+>>>L[:10:2]    #前10个数，每两个取一个
+[0,2,4,6,8]
+>>>L[::5]      #所有数，每5个取一个
+[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95]
+
+#默认情况下，dict迭代的是key。如果迭代value，可以用for value in d.values()，如果同时迭代key和value，可以使用for k,v in d.items()
+
+#Python内置的enumerate函数可以把一个list变成索引-元素对，如下：
+>>>for i ,value in enumerate(['A','B','C']):
+...     print(i,value)
+...
+0 A
+1 B
+2 C
+
+>>>for x,y in [(1,1),(2,4),(3,9)]:
+...     print(x,y)
+...
+1 1
+2 4
+3 9
+
+#列表生成式
+>>>[X * X for X in range(1,11)]
+[1,4,9,16,25,36,49,64,81,100]
+
+>>>[X * X for X in range(1,11) if X % 2==0]
+[4,16,36,64,100]
+
+>>>[m + n for m in 'ABC' for n in 'XYZ']
+['AX','AY','AZ','BX','BY','BZ','CX','CY','CZ']
+
+
+
