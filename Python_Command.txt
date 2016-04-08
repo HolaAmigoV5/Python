@@ -616,3 +616,278 @@ class Bat(Mammal,Flyable):    #蝙蝠类多继承哺乳类和能飞类
     pass
     
 #MixIn的目的就是给一个类增加多个功能，这样，类设计时，我们优先考虑通过过继承来组合多个MixIn的功能，而不是设计多层次的复杂继承关系
+
+
+#定制类
+#__str__()返回用户看到的字符串
+>>>class Student(object):
+...     def __init__(self,name):
+...         self.name=name
+...     def __str__(self):
+...         return 'Student object (name:%s)'% self.name
+...
+
+>>>print(Student('Michael'))
+Student object (name:Michael)
+
+>>>s=Student('Michael')  #直接敲变量不用print，打印出来的实例还是不好看，这是因为直接显示变量调用的是__repr__()
+>>>s
+<__main__.Student object at 0x1022ef630>
+
+#__repr__
+#返回程序开发者看到的字符串，是为调试服务的
+class Student(object):
+    def __init__(self,name):
+        self.name=name
+    def __str__(self):
+        return 'Student object (name=%s)'%self.name
+    __repr__=__str__
+    
+#__iter__
+#如果一个类想被用于for...in循环，就必须实现一个__iter__()方法，该方法返回一个迭代对象
+#然后，Pytho的for循环会不断调用该迭代对象的__next__()方法拿到循环的下一个值，直到遇到StopIteration错误时退出循环
+class Fib(object):
+    def __init__(self):
+        self.a,self.b=0,1   #初始化两个计数器a,b
+    def __iter__(self):
+        return self         #实例本身就是迭代对象，故返回自己
+        
+    def __next__(self):
+        self.a,self.b=self.b,self.a+self.b #计算下一个值
+        if self.a>100:  #退出循环条件
+            raise StopIteration();
+        return self.a       #返回下一个值
+        
+>>>for n in Fib():
+...    print(n)
+...
+
+
+#__getitem__
+#可以使Fib()像list那样按照下标取出元素，需要实现该方法
+class Fib(object):
+    def __getitem__(self,n):
+        a,b=1,1
+        for x in range(n):
+            a,b=b,a+b
+        return a
+#现在可以按照下标访问数列的任意一项了
+#但是list有一个神奇的切片方法，对于Fib却报错。原因是__getitem__传入的可能是一个int，也可能是一个切片对象slice，所以要做判断
+class Fib(object):
+    def __getitem__(self,n):
+        if isinstance(n,int):  #n是索引
+            a,b=1,1
+            for x in range(n):
+                a,b=b,a+b
+            return a
+        if isinstance(n,slice): #n是切片
+            start=n.start
+            stop=n.stop
+            if start is None:
+                start=0
+            a,b=1,1
+            L=[]
+            for x in range(stop):
+                if x>=start:
+                    L.append(a)
+                a,b=b,a+b
+            return L
+#现在Fib()拥有了切片功能
+
+#与之对应的__setitem__()方法，把对象视作list或dic来对集合赋值，还有__delitem__()方法，用于删除某个元素
+#总之通过以上方法，我们可以的类表现得和Python自带的list、tuple、dict没有什么区别，这完全归功于动态语言的“鸭子类型”，不需要强制继承某个接口
+
+#__getattr__
+#在没有找到属性的情况下，才会调用该方法，要让class只相应特定的几个属性，我们就按照约定，抛出AttributerError的错误
+#使用__getattr__可以写出一个链式调用
+class Chain(object):
+    def __init__(self,path=''):
+        self._path=path
+    def __getattr__(self,path):
+        return Chain('%s/%s'%(self._path,path))
+    def __str__(self):
+        return self._path
+    __repr__=__str__
+    
+>>>Chain().status.user.timeline.list
+'/status/user/timeline/list'
+#这样无论API怎么变，SDK都可以根据URL实现完全动态的调用，而且，不随API的增加而改变
+
+#__call__
+#只需要定义__call__方法，就可以直接对实例进行调用
+class Student(object):
+    def __init__(self,name):
+        self.name=name
+    def __call__(self):
+        print('My name is %s'%self.name)
+>>>s=Student('Michael')
+>>>s()   #self参数不用传递
+My name is Michael
+
+#通过callable()函数，我们可以判断一个对象是否是“可调用”对象
+
+#type()
+#type()函数可以查看一个类型或变量的类型，还可以动态创建出新的类型，如：
+>>>def = fn(self,name='world'):   #先定义函数
+...     print('Hello,%s.'%name)
+...
+>>>Hello=type('Hello',(object,),dict(hello=fu))  #创建Hello class
+>>>h=Hello()
+>>>h.hello()
+Hello,world.
+>>>print(type(Hello))
+<class 'type'>
+>>>print(type(h))
+<class '__main__.Hello'>
+#要创建一个class对象，type()函数依次传入3个参数
+#1.class的名称
+#2.继承的父类集合，注意python支持多继承，如果只有一个父类，别忘了tuple的单元素写法；
+#3.class的方法名称与函数绑定，这里我们把函数fn绑定到方法名hello上
+
+#metaclass
+#元类，如果想创建出类，必须根据metaclass 创建出类，即：先定义metaclass，就可以创建类，最后创建实例（太强大，搞不懂）
+
+#错误处理
+#捕获错误：try... except... finally...
+#抛出错误：raise
+
+#程序调试
+#方法一：可以使用print()
+#方法二：使用assert()
+    #如果程序中到处充斥着assert()，启动Python时，可以用-0参数关闭assert，关闭后，所有的assert相当于pass
+#方法三：使用logging,logging.info()可以输出一段文本。
+import logging
+logging.basicConfig(level=logging.INFO)
+    #添加以上配置才能显示详细信息
+    #这就是logging的好处，它允许你指定记录信息的级别，有debug，info,warning，error等几个级别
+#方法四：pdb
+    #以参数-m pbd启动后，输入命令n可以单步执行代码，任何时候可以输入（p 变量名）来查看变量，输入命令q结束调试，退出程序
+#方法五：pbd.set_trace()
+    #需要import pdb，然后在可能出错的地方放一个pbd.set_trace()，就可以设置一个断点
+#推荐使用的调试工具是：PyCharm
+
+
+#IO编程
+#读文件，使用Python内置的open()函数
+>>>f=open('/users/michael/my_py_scripts','r')   #标识符'r'表示读，如果文件不存在就会抛出IOError的错误
+#Python引入了with语句来自动帮我们调用close()方法
+with open('.\111.txt','r') as f:
+    print(f.read())
+    
+#如果文件很小，read()一次性读取最方便，如果不能确定文件，大小反复调用read(size)，如果是配置文件，调用readlines()最方便
+for line in f.readlines():
+    print(line.strip())   #把末尾的'\n'删除
+
+#二进制文件
+>>>f=open('.\111.txt','rb')
+>>>f.read()
+
+#字符编码
+>>>f=open('.\111.txt','r',encoding='gbk')
+>>>f.read()
+
+>>>f=open('.\111.txt','r',encoding='gbk',errors='ignore')
+
+#写文件
+>>>f=open('.\111.txt','w')
+
+#StringIO
+#StringIO就是在内存中读写str
+#要把str写入StringIO，我们需要先创建一个StringIO，然后，像文件一样写入即可
+>>>from io import StringIO
+>>>f=StringIO()
+>>>f.write('hello')
+5
+>>>print(f.getvalue())   #getvalue()用于获得写入后的str
+hello
+
+#读取StringIO
+>>>from io import StringIO
+>>>f=StringIO('Hello!\nHi!\nGoodbye!')
+>>>while True:
+...     s=f.readline()
+...     if s=='':
+...         break
+...     print(s.strip())
+...
+Hello!
+Hi!
+Goodbye!
+
+#BytesIO
+#StringIO操作只能是str，如果要操作二进制数据，需要使用BytesIO
+#BytesIO实现了在内存中读写bytes，我们创建一个BytesIO，然后写入一些bytes
+>>>from io import BytesIO
+>>>f=BytesIO()
+>>>f.write('中文',encode('utf-8'))
+6
+>>>print(f.getvalue())
+
+#Python内置os模块调用操作系统提供的接口函数
+#os.environ能获取环境变量
+#os.environ.get('key'),获取环境变量的某一个值
+
+#查看当前目录的绝对路径
+>>>os.path.abspath('.')
+#在某个目录下创建一个新目录，首先把新目录的完整路径表示出来
+>>>os.path.join('/Users/michael','testdir')
+'/Users/michael/testdir'
+#创建一个目录
+>>>os.mkdir('Users/michael/testdir')
+#删除一个目录
+>>>os.rmdir('Users/michael/testdir')
+
+#合并路径用os.path.join(),拆分路径用os.path.split()函数，os.path.splitext()可以拆分得到扩展名
+
+#对文件重命名
+>>>os.rename('test.txt','test.py')
+#删除文件
+>>>os.remove('test.py')
+
+#shutil模块提供了copyfile()函数，可以看做是os模块的补充
+
+#序列号(pickling)，反序列化(unpickling)
+#Python提供了pickle模块来实现序列化
+>>>import pickle
+>>>d=dict(name='Bob',age=20,score=88)
+>>>pickle.dumps(d)  #pickle.dump()方法把任意对象序列化为一个bytes，然后就可以把这个bytes写入文件
+
+>>>f=open('dump.txt','wb')
+>>>pickle.dumps(d,f)  #把对象序列化后写入一个file-like Object
+>>>f.close()
+
+#可以先把内容读到一个bytes，然后用pickle.loads()方法反序列化出对象
+>>>f=open('dump.txt','rb')
+>>>d=pickle.loads(f)
+>>>f.close()
+>>>d
+{'age':20,'score':88,'name':Bob}
+
+>>>import json
+>>>d=dict(name='Bob',age=20,score=88)
+>>>json.dumps(d)     #序列化为json对象
+'{'age':20,'score':88,'name':Bob}'
+
+>>>json_str='{'age':20,'score':88,'name':Bob}'
+>>>json.loads(json_str)    #json反序列化
+{'age':20,'score':88,'name':Bob}
+
+#对class的序列化和反序列化
+import json
+class Student(object):
+    def __init__(self,name,age,score):
+        self._name_=name
+        self._age=age
+        self._score=score
+    def student2dict(std):
+        return {'name':name,'age':age,'score':score}
+
+>>>s=Student('Bob',20,88)
+>>>print(json.dumps(s,default=student2dict))  #可选参数default就是把任意对象变成一个可序列化json的对象
+{'age':20,'score':88,'name':Bob}
+
+>>>print(json.dumps(s,default=lambda obj:obj.__dict__))  #偷懒写法，把任意class实例变为dict
+
+def dict2student(d):
+    return Student(d['name'],d['age'],d['score'])
+>>>print(json.loads(json_str,object_hook=dict2student))   #反序列化
