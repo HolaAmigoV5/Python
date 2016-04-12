@@ -1344,5 +1344,96 @@ while True:
     print('Received from %s:%s.'%addr)
     s.sendto(b'Hello,%s!'%data,addr)       #sendto()将数据发送给指定的地址和端口客户端
     
-    
 
+
+--访问数据库
+#使用SQLite
+>>> import sqlite3   #导入SQLite驱动
+#连接SQLite数据库
+#数据库文件是test.db，如果文件不存在，会自动在当前目录创建
+>>> conn=sqlite3.connect('test.db')
+#创建一个Cursor
+>>> cursor=conn.cursor()
+#执行一条SQL语句，创建user表
+>>> cursor.execute('create table user(id varchar(20) primary key,name varchar(20))')
+<sqlite3.Cursor object at 0x00585CE0>
+#插入一条记录
+>>> cursor.execute('insert into user (id,name) values (\'1\',\'Michael\')')
+<sqlite3.Cursor object at 0x00585CE0>
+#通过rowcount获得插入的行数
+>>> cursor.rowcount
+1
+>>> cursor.close()   #关闭cursor
+>>> conn.commit()    #提交事务
+>>> conn.close()     #关闭Connection
+#再试试查询记录
+>>> conn=sqlite3.connect('test.db')
+>>> cursor=conn.cursor()
+#执行查询语句
+>>> cursor.execute('select * from user where id=?',('1',))
+<sqlite3.Cursor object at 0x00585F20>
+#获得查询结果集
+>>> values=cursor.fetchall()
+>>> values
+[('1', 'Michael')]
+>>> cursor.close()
+>>> conn.close()    
+#注意：Connection和Cursord对象，打开后一定记得关闭，就可以放心的使用
+#使用Cursor对象执行insert,update,delete语句时，执行结果由rowcount返回影响的行数，就可以拿到执行的结果
+#使用Cursor对象执行select语句时，通过featchall()可以拿到结果集。结果集是一个list，每个元素都是一个tuple，对应一行记录
+#如果SQL语句带有参数，那么需要把参数按照位置传递给execute()方法，由几个?占位符就必须对应几个参数，如：
+cursor.execute('select * from user where name=? and pwd=?',('abc','password'))
+
+#使用MySQL
+
+
+
+
+
+--Web开发
+#HTTP请求
+#1.浏览器首先向服务器发送HTTP请求，get仅请求资源，post会附带用户数据
+#2.服务器会向浏览器返回HTTP响应，响应包括：
+    #响应代码：200表示成果，3xx表示重定向，4xx表示客户端发送的请求错误，5xx表示服务端处理时发生错误
+    #响应类型：由Content-Type指定
+    #以及其他相关的Header
+   #通常服务器的HTTP响应会携带内容，也就是一个Body，包含响应的内容，网页的HTML源码就在Body中
+#3.如果浏览器还需要继续向服务器请求其他资源，比如图片，就再次发送HTTP请求，重复步骤1,2
+
+#HTTP格式
+#HTTP GET请求格式
+GET /path HTTP/1.1
+Header1:Value1
+Header2:Value2
+Header3:Value3
+#每一个Header一行一个，换行符是\r\n
+
+#HTTP POST请求的格式
+POST /path HTTP/1.1
+Header1:Value1
+Header2:Value2
+Header3:Value3
+
+body data goes here...
+#当遇到两个\r\n时，Header部分结束，后面的数据全部是Body
+
+#HTTP响应格式
+200 OK
+Header1:Value1
+Header2:Value2
+Header3:Value3
+
+body data goes here...
+#HTTP响应如果包含body，也通过\r\n\r\n来分隔，注意，Body的数据类型由Content-Type头来确定，
+#如果是网页，Body是文本，如果是图片，Body就是图片的二进制数据
+#当存在Content-Encoding时，Body数据是被压缩的，最常见的压缩格式是gzip，
+#所以看到Content-Encoding:gzip时，需要将Body数据先解压缩，才能得到正真的数据。
+#压缩的目的在于减少Body的大小，加快网络传输
+#推荐的HTTP书：HTTP权威指南
+
+#Flask框架使用
+#除了Flask框架，常见的Python Web框架还有：
+    #Django:全能型web框架；
+    #web.py:一个小巧的web框架
+    #Bottle：和Flask类似的Web框架
+    #Tormado:Facebook的开源异步web框架
