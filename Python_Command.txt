@@ -1437,3 +1437,96 @@ body data goes here...
     #web.py:一个小巧的web框架
     #Bottle：和Flask类似的Web框架
     #Tormado:Facebook的开源异步web框架
+
+#协程
+def consumer():      #消费者
+    r=''
+    while True:
+        n=yield r    #通过yield拿到消息，处理，并通过yield把结果传回
+        if not n:
+            return
+        print('[CONSUMER] Consuming %s...'% n)
+        r='200 OK'
+        
+def produce(c):      #消费者
+    c.send(None)     #启动生成器consumer对象
+    n=0
+    while n<5:
+        n=n+1
+        print('[PPRODUCE] Producing %s...'% n)
+        r=c.send(n)  #切换到consumer执行，并返回r
+        print('[PPRODUCE] Consumer return :%s'% r)
+    c.close()
+    
+c=consumer()
+produce(c)
+
+#输出：
+[PPRODUCE] Producing 1...
+[CONSUMER] Consuming 1...
+[PPRODUCE] Consumer return :200 OK
+[PPRODUCE] Producing 2...
+[CONSUMER] Consuming 2...
+[PPRODUCE] Consumer return :200 OK
+[PPRODUCE] Producing 3...
+[CONSUMER] Consuming 3...
+[PPRODUCE] Consumer return :200 OK
+[PPRODUCE] Producing 4...
+[CONSUMER] Consuming 4...
+[PPRODUCE] Consumer return :200 OK
+[PPRODUCE] Producing 5...
+[CONSUMER] Consuming 5...
+[PPRODUCE] Consumer return :200 OK
+
+#整个流程无锁，由一个线程执行，produce和consumer协作完成任务，所以称为“协程”
+
+#asyncio
+>>> import asyncio
+>>> @asyncio.coroutine   #把一个generator标记为coroutine(协同程序)类型，然后把这个协同程序扔到EventLoop中执行
+... def hello():
+...    print('Hello world!')
+       #异步调用asyncio.sleep(1)
+...    r=yield from asyncio.sleep(1)
+...    print('Hello again!')
+...
+
+>>> loop=asyncio.get_event_loop()       #获取EventLoop:
+>>> loop.run_until_complete(hello())    #执行coroutine
+Hello world!
+Hello again!
+>>> loop.close()
+
+#用Task封装两个coroutine
+>>> import asyncio
+>>> import threading
+>>> @asyncio.coroutine
+... def hello():
+...    print('Hello world!(%s)'%threading.currentThread())
+...    yield from asyncio.sleep(1)
+...    print('Hello again!(%s)'%threading.currentThread())
+...
+>>> loop=asyncio.get_event_loop()
+>>> tasks=[hello(),hello()]
+>>> loop.run_until_complete(asyncio.wait(tasks))
+Hello world!(<_MainThread(MainThread, started 8356)>)
+Hello world!(<_MainThread(MainThread, started 8356)>)
+(暂停约1秒)
+Hello again!(<_MainThread(MainThread, started 8356)>)
+Hello again!(<_MainThread(MainThread, started 8356)>)
+
+#async/await
+#async/await是针对coroutine的新语法，要使用新语法，需要做两步简单替换
+    #1.@asyncio.coroutine替换为async
+    #2.yield from 替换为await
+    
+@asyncio.coroutine
+def hello():
+    print("Hello world!")
+    r = yield from asyncio.sleep(1)
+    print("Hello again!")
+    
+#替换后 
+async def hello():
+    print("Hello world!")
+    r = await asyncio.sleep(1)
+    print("Hello again!")
