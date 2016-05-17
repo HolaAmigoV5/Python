@@ -1530,3 +1530,31 @@ async def hello():
     print("Hello world!")
     r = await asyncio.sleep(1)
     print("Hello again!")
+
+    
+#aiohttp
+#asyncio可以实现单线程并发IO操作。一般用在服务器上，可以使用单线程+coroutine实现多用户的高并发支持
+#asyncio实现了TCP，UDP，SSL协议，aiohttp则基于asyncio实现的HTTP框架
+
+
+
+--搭建开发环境
+#异步框架aiohttp
+pip3 install aiohttp
+#前端模板引擎
+pip3 install jinja2
+#MySql的Python异步驱动程序aiomysql
+pip3 install aiomysql
+
+--相关有用的终端命令
+#MySql命令
+mysql -u root -p;   #使用用户名root和密码（密码在输入该命令后输入）登录mysql
+show databases;     #查看服务器上当前数据库
+use awesome;        #选择你所创建的数据库
+show tables;        #查看现在的数据库表
+create table students (stuid VARCHAR(20), sex CHAR(1));
+describe students;   #显示表的结构
+
+
+#部署
+supervisorctl tail awesome  #查看awesome服务的错误信息
